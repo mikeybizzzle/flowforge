@@ -4,7 +4,9 @@
       "mcp__filesystem__list_directory",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(gh auth status:*)",
+      "Bash(gh repo create:*)"
     ]
   },
   "enabledMcpjsonServers": [
