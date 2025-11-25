@@ -18,6 +18,7 @@ import {
   Settings,
   LayoutGrid,
   Eye,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProjectSettingsDialog } from "./project-settings-dialog";
@@ -30,14 +31,61 @@ interface ProjectEditorHeaderProps {
 export function ProjectEditorHeader({ project }: ProjectEditorHeaderProps) {
   const { activeView, setActiveView, project: storeProject } = useCanvasStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Use store project if available (it gets updated when settings change)
   const currentProject = storeProject || project;
 
-  const handleExport = () => {
-    toast.info("Export feature coming soon", {
-      description: "You'll be able to download your project as code",
-    });
+  const handleExport = async () => {
+    setIsExporting(true);
+    const toastId = toast.loading("Preparing export...");
+
+    try {
+      const response = await fetch("/api/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: currentProject.id,
+          options: {
+            includeComponents: true,
+            includeStyles: true,
+            includeConfigs: true,
+            format: "nextjs",
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to export project");
+      }
+
+      // Get the blob from response
+      const blob = await response.blob();
+
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${currentProject.name.toLowerCase().replace(/\s+/g, "-")}-export.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success("Project exported!", {
+        id: toastId,
+        description: "Your Next.js project is ready",
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Export failed", {
+        id: toastId,
+        description: error instanceof Error ? error.message : "Unknown error",
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleDeploy = () => {
@@ -115,8 +163,12 @@ export function ProjectEditorHeader({ project }: ProjectEditorHeaderProps) {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={handleExport}>
-                <Download className="w-4 h-4" />
+              <Button variant="ghost" size="icon" onClick={handleExport} disabled={isExporting}>
+                {isExporting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>Export Project</TooltipContent>
