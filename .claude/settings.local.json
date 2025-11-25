@@ -6,7 +6,9 @@
       "mcp__context7__get-library-docs",
       "Bash(npm install:*)",
       "Bash(gh auth status:*)",
-      "Bash(gh repo create:*)"
+      "Bash(gh repo create:*)",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__write_file"
     ]
   },
   "enabledMcpjsonServers": [
