@@ -76,7 +76,7 @@ export function NodeConfigDialog({ open, onOpenChange, nodeId }: NodeConfigDialo
       const supabase = createClient();
       const { error } = await supabase
         .from("nodes")
-        .update({ data: formData })
+        .update({ data: formData as NodeData })
         .eq("id", nodeId);
 
       if (error) throw error;

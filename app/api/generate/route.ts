@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
       : 1;
 
     // Save generation to database
-    const { data: generation, error: saveError } = await supabase
+    const { data: generationData, error: saveError } = await supabase
       .from("generations")
       .insert({
         node_id: nodeId,
@@ -225,15 +225,17 @@ export async function POST(request: NextRequest) {
       console.error("Failed to save generation:", saveError);
     }
 
+    const generation = generationData as { id: string } | null;
+
     // Update node with generated content - fetch current data and merge
-    const { data: currentNode } = await supabase
+    const { data: currentNodeData } = await supabase
       .from("nodes")
       .select("data")
       .eq("id", nodeId)
       .single();
 
-    if (currentNode) {
-      const currentData = currentNode.data as SectionNodeData;
+    if (currentNodeData) {
+      const currentData = (currentNodeData as { data: SectionNodeData }).data;
       await supabase
         .from("nodes")
         .update({

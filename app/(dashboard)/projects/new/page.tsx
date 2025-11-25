@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import type { Database, Project } from "@/types";
 
 export default function NewProjectPage() {
   const [name, setName] = useState("");
@@ -40,39 +41,43 @@ export default function NewProjectPage() {
       return;
     }
 
-    const { data, error: insertError } = await supabase
+    const insertData: Database["public"]["Tables"]["projects"]["Insert"] = {
+      user_id: user.id,
+      name: name.trim(),
+      description: description.trim() || null,
+      settings: {
+        industry: industry.trim() || undefined,
+        target_audience: targetAudience.trim() || undefined,
+      },
+    };
+
+    const { data: projectData, error: insertError } = await supabase
       .from("projects")
-      .insert({
-        user_id: user.id,
-        name: name.trim(),
-        description: description.trim() || null,
-        settings: {
-          industry: industry.trim() || null,
-          target_audience: targetAudience.trim() || null,
-        },
-      })
+      .insert(insertData)
       .select()
       .single();
 
     if (insertError) {
       setError(insertError.message);
       setLoading(false);
-    } else if (data) {
+    } else if (projectData) {
+      const project = projectData as Project;
       // Create initial project node
-      await supabase.from("nodes").insert({
-        project_id: data.id,
+      const nodeData: Database["public"]["Tables"]["nodes"]["Insert"] = {
+        project_id: project.id,
         type: "project",
         position: { x: 400, y: 50 },
         data: {
           type: "project",
           name: name.trim(),
-          description: description.trim() || null,
-          industry: industry.trim() || null,
-          target_audience: targetAudience.trim() || null,
+          description: description.trim() || undefined,
+          industry: industry.trim() || undefined,
+          target_audience: targetAudience.trim() || undefined,
         },
-      });
+      };
+      await supabase.from("nodes").insert(nodeData);
 
-      router.push(`/project/${data.id}`);
+      router.push(`/project/${project.id}`);
     }
   };
 

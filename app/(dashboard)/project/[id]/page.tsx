@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProjectEditor } from "@/components/layout/project-editor";
+import type { Project, CanvasNode, CanvasEdge, Message } from "@/types";
 
 interface ProjectPageProps {
   params: Promise<{ id: string }>;
@@ -9,7 +10,7 @@ interface ProjectPageProps {
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { id } = await params;
   const supabase = await createClient();
-  
+
   // Fetch project
   const { data: project, error } = await supabase
     .from("projects")
@@ -42,10 +43,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <ProjectEditor
-      project={project}
-      initialNodes={nodes || []}
-      initialEdges={edges || []}
-      initialMessages={messages || []}
+      project={project as Project}
+      initialNodes={(nodes || []) as CanvasNode[]}
+      initialEdges={(edges || []) as CanvasEdge[]}
+      initialMessages={(messages || []) as Message[]}
     />
   );
 }

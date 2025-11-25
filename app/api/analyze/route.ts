@@ -62,21 +62,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user owns the node (via project ownership)
-    const { data: node, error: nodeError } = await supabase
+    const { data: nodeData, error: nodeError } = await supabase
       .from("nodes")
       .select("id, project_id, data, projects!inner(user_id)")
       .eq("id", nodeId)
       .single();
 
-    if (nodeError || !node) {
+    if (nodeError || !nodeData) {
       return NextResponse.json(
         { error: "Node not found or unauthorized" },
         { status: 404 }
       );
     }
 
+    const node = nodeData as { id: string; project_id: string; data: CompetitorNodeData };
+
     // Update node status to analyzing
-    const currentData = node.data as CompetitorNodeData;
+    const currentData = node.data;
     await supabase
       .from("nodes")
       .update({

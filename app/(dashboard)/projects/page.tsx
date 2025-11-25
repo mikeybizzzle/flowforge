@@ -4,17 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, FolderKanban, Clock, ArrowRight } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
+import type { Project } from "@/types";
 
 export default async function ProjectsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   // Fetch user's projects
-  const { data: projects } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("user_id", user?.id)
-    .order("updated_at", { ascending: false });
+  const { data: projectsData } = user
+    ? await supabase
+        .from("projects")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false })
+    : { data: null };
+
+  const projects = projectsData as Project[] | null;
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

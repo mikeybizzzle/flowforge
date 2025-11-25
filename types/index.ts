@@ -1,35 +1,167 @@
 // Database types (matches Supabase schema)
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       projects: {
-        Row: Project;
-        Insert: Omit<Project, 'id' | 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<Project, 'id'>>;
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          description: string | null;
+          settings: ProjectSettings;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          description?: string | null;
+          settings?: ProjectSettings;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          description?: string | null;
+          settings?: ProjectSettings;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       nodes: {
-        Row: CanvasNode;
-        Insert: Omit<CanvasNode, 'id' | 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<CanvasNode, 'id'>>;
+        Row: {
+          id: string;
+          project_id: string;
+          type: NodeType;
+          position: { x: number; y: number };
+          data: NodeData;
+          parent_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          type: NodeType;
+          position: { x: number; y: number };
+          data: NodeData;
+          parent_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          type?: NodeType;
+          position?: { x: number; y: number };
+          data?: NodeData;
+          parent_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       edges: {
-        Row: CanvasEdge;
-        Insert: Omit<CanvasEdge, 'id' | 'created_at'>;
-        Update: Partial<Omit<CanvasEdge, 'id'>>;
+        Row: {
+          id: string;
+          project_id: string;
+          source_id: string;
+          target_id: string;
+          type: 'default' | 'data-flow' | 'hierarchy';
+          data: Record<string, unknown> | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          source_id: string;
+          target_id: string;
+          type?: 'default' | 'data-flow' | 'hierarchy';
+          data?: Record<string, unknown> | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          source_id?: string;
+          target_id?: string;
+          type?: 'default' | 'data-flow' | 'hierarchy';
+          data?: Record<string, unknown> | null;
+          created_at?: string;
+        };
+        Relationships: [];
       };
       generations: {
-        Row: Generation;
-        Insert: Omit<Generation, 'id' | 'created_at'>;
-        Update: Partial<Omit<Generation, 'id'>>;
+        Row: {
+          id: string;
+          node_id: string;
+          type: 'prd' | 'code' | 'analysis';
+          content: string;
+          metadata: Record<string, unknown> | null;
+          version: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          node_id: string;
+          type: 'prd' | 'code' | 'analysis';
+          content: string;
+          metadata?: Record<string, unknown> | null;
+          version?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          node_id?: string;
+          type?: 'prd' | 'code' | 'analysis';
+          content?: string;
+          metadata?: Record<string, unknown> | null;
+          version?: number;
+          created_at?: string;
+        };
+        Relationships: [];
       };
       messages: {
-        Row: Message;
-        Insert: Omit<Message, 'id' | 'created_at'>;
-        Update: Partial<Omit<Message, 'id'>>;
+        Row: {
+          id: string;
+          project_id: string;
+          node_id: string | null;
+          role: 'user' | 'assistant';
+          content: string;
+          metadata: Record<string, unknown> | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          node_id?: string | null;
+          role: 'user' | 'assistant';
+          content: string;
+          metadata?: Record<string, unknown> | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          node_id?: string | null;
+          role?: 'user' | 'assistant';
+          content?: string;
+          metadata?: Record<string, unknown> | null;
+          created_at?: string;
+        };
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
-}
+};
 
 // Project
 export interface Project {
