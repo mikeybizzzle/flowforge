@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__filesystem__list_directory",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(npm install:*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "shadcn",
+    "filesystem",
+    "memory",
+    "sequential-thinking",
+    "playwright",
+    "google-sheets",
+    "context7",
+    "firecrawl-mcp"
+  ]
+}
